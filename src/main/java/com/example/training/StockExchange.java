@@ -1,6 +1,15 @@
 package com.example.training;
 
+import org.springframework.util.Assert;
+
+import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class StockExchange {
 //    static Connection connection = null; // Соединение приложениея с БД
@@ -80,22 +89,69 @@ public class StockExchange {
 //        }
 //    }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+//        ExecutorService exec = Executors.newCachedThreadPool();
+//        Future<Integer> f = exec.submit(() -> { return 11; } );
+//        int result = f.get();
+//        System.out.println(result);
+//        exec.shutdown();
+
+//        Comparator<Node> comparator = new Comparator<Node>() {
+//            @Override
+//            public int compare(Node o1, Node o2) {
+//                return o1.id.compareTo(o2.id);
+//            }
+//        };
+//
+//        Comparator<Node> comparator1 = Comparator.comparing(obj -> obj.id);
+//        Stream.generate(() -> 2).forEach(System.out::println);
+
+//        Callable task = () -> {
+//            return "Hello, World!";
+//        };
+//        FutureTask<String> future = new FutureTask<>(task);
+//        System.out.println(future.get());
+
         CompletableFuture<String> completed;
-        completed = CompletableFuture.completedFuture("Просто значение");
-        // CompletableFuture, запускающий (run) новый поток с Runnable, поэтому он Void
+        completed = CompletableFuture.completedFuture("value");
+
+        completed = CompletableFuture.supplyAsync(() -> {
+            System.out.println("dfpgoidf");
+            return "1";
+        });
+
         CompletableFuture<Void> voidCompletableFuture;
         voidCompletableFuture = CompletableFuture.runAsync(() -> {
             System.out.println("run " + Thread.currentThread().getName());
         });
-        // CompletableFuture, запускающий новый поток, результат которого возьмём у Supplier
-        CompletableFuture<String> supplier;
-        supplier = CompletableFuture.supplyAsync(() -> {
-            System.out.println("supply " + Thread.currentThread().getName());
-            return "Значение";
-        });
+
+
+        CompletableFuture<String> future1
+                = CompletableFuture.supplyAsync(() -> "Hello");
+        CompletableFuture<String> future2
+                = CompletableFuture.supplyAsync(() -> "Beautiful");
+        CompletableFuture<String> future3
+                = CompletableFuture.supplyAsync(() -> "World");
+
+        CompletableFuture<Void> combinedFuture
+                = CompletableFuture.allOf(future1, future2, future3);
+
+        String combined = Stream.of(future1, future2, future3)
+                .map(CompletableFuture::join)
+                .collect(Collectors.joining(" "));
+
+        System.out.println("Hello Beautiful World".equals(combined));
+
     }
 
+}
+
+class Node {
+    public Node(int id) {
+        this.id = id;
+    }
+
+    public Integer id;
 
 
 }
